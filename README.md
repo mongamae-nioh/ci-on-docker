@@ -101,7 +101,7 @@ P84 の `VAGRANT_PRIVATE_KEY` に設定する鍵の内容は紙面と同じ `cat
 著者のREADMEに記載無いがそのまま進めると110ページでつまづくはず。
 以下の準備が必要。
 
-**1つ目**
+### /etc/sudoersエラー回避
 site.yml 48～52行目を削除すること。
 ```
     - lineinfile:
@@ -117,7 +117,7 @@ Permission denied: '/etc/sudoers'
 
 また、client1~4のコンテナの/etc/sudoersは期待通りの設定になっているため上記の行は削除した。
 
-**2つ目**
+### Permission denied回避
 --private-keyオプションでSSHキーを指定すること。
 オプションなしだと以下のエラーが出る。
 
@@ -132,6 +132,11 @@ docker exec -it -u vagrant console bash
 ansible-playbook --private-key=/home/vagrant/.ssh/infraci -i hosts site.yml
 ```
 
+## ketchup環境用スクリプト
+
+```
+git clone https://github.com/infra-ci-book/ketchup-vagrant-ansible.git
+```
 
 ## 環境の再起動等
 
