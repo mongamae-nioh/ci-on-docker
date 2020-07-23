@@ -68,7 +68,7 @@
         name: "{{ item }}"
         state: present
       loop:
-        - ansible-2.4.2.0-2.el7
+        - ansible-2.9.10-1.el7
 
     - systemd:
         name: sshd
