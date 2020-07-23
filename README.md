@@ -133,9 +133,30 @@ ansible-playbook --private-key=/home/vagrant/.ssh/infraci -i hosts site.yml
 ```
 
 ## ketchup環境用スクリプト
+5章で使うので以下をクローンしておく
 
 ```
 git clone https://github.com/infra-ci-book/ketchup-vagrant-ansible.git
+```
+
+p.110を実行すると以下のエラーが出た。
+```
+TASK [nginx : Grant selinux permission for Nginx] ***********************************************************************************************************
+fatal: [192.168.33.13]: FAILED! => {"msg": "The conditional check 'result|success and result.stdout.lower() != \"disabled\"' failed. The error was: template error while templating string: no filter named 'success'. String: {% if result|success and result.stdout.lower() != \"disabled\" %} True {% else %} False {% endif %}\n\nThe error appears to be in '/home/vagrant/ketchup-vagrant-ansible/roles/nginx/tasks/main.yml': line 20, column 5, but may\nbe elsewhere in the file depending on the exact syntax problem.\n\nThe offending line appears to be:\n\n\n  - name: Grant selinux permission for Nginx\n    ^ here\n"}
+```
+
+/home/vagrant/ketchup-vagrant-ansible/roles/nginx/tasks/main.yml
+20~27行目を削除してエラーを回避
+
+```
+ - name: Grant selinux permission for Nginx
+     seboolean:
+       name: '{{item}}'
+       persistent: yes
+       state: True
+     with_items:
+       - httpd_can_network_connect
+     when: 'result|success and result.stdout.lower() != "disabled"'
 ```
 
 ## 環境の再起動等
