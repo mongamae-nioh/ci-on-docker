@@ -97,6 +97,40 @@ P84 の `VAGRANT_PRIVATE_KEY` に設定する鍵の内容は紙面と同じ `cat
 
 本編ではホストマシンから vagrant ssh コマンドを利用してサーバーにログインする操作が含まれています。コンテナ環境を用いた場合は vagrant コマンドが利用できないため、代わりにホストマシンから docker exec コマンドを利用してください。
 
+## consoleからansible-playbookを実行する際の注意点
+著者のREADMEに記載無いがそのまま進めると110ページでつまづくはず。
+以下の準備が必要。
+
+**1つ目**
+site.yml 48～52行目を削除すること。
+```
+    - lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^vagrant\s'
+        line: 'vagrant ALL=(ALL) NOPASSWD: ALL'
+```
+
+lineinfileで各コンテナの/etc/sudoersを編集しようとするがこの行があると
+Permission denied: '/etc/sudoers' 
+となってansible-playbookがfailedになってしまう。
+
+また、client1~4のコンテナの/etc/sudoersは期待通りの設定になっているため上記の行は削除した。
+
+**2つ目**
+--private-keyオプションでSSHキーを指定すること。
+オプションなしだと以下のエラーが出る。
+
+```
+TASK [yum] **************************************************************************************************************************************************
+failed: [console] (item=openssh-server) => {"ansible_loop_var": "item", "item": "openssh-server", "msg": "Failed to connect to the host via ssh: Warning: Permanently added 'console,192.168.33.99' (ECDSA) to the list of known hosts.\r\nPermission denied (publickey,gssapi-keyex,gssapi-with-mic,password).", "unreachable": true}
+```
+
+最終的には以下のコマンドで成功した。
+```
+docker exec -it -u vagrant console bash
+ansible-playbook --private-key=/home/vagrant/.ssh/infraci -i hosts site.yml
+```
 
 
 ## 環境の再起動等
