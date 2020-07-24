@@ -76,8 +76,8 @@ docker exec gitlab-runner \
 
 - 新規プロジェクトを作成して import project -> repo by URL から `https://github.com/infra-ci-book/ci-on-docker.git` をインポートする。
 - ci-on-docker のプロジェクトページから CI/CD -> pipelines -> run pipeline からパインプラインを実行する。
+ - client1-4を再作成した場合はpipelineを実行すること。
 - 全ての処理が成功すると本編と同じ環境に設定される。
-
 
 
 ## 演習の開始
